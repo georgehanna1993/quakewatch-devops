@@ -1,0 +1,7 @@
+services:
+  quakewatch:
+    build: .
+    container_name: quakewatch_app
+    ports:
+      - "5050:5000"
+    restart: always

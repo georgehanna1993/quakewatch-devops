@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quakewatch
+  namespace: quakewatch
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: quakewatch
+  template:
+    metadata:
+      labels:
+        app: quakewatch
+    spec:
+      containers:
+        - name: quakewatch
+          image: gh93/quakewatch:v1
+          ports:
+            - containerPort: 5000
+          envFrom:
+            - configMapRef:
+                name: quakewatch-config
+            - secretRef:
+                name: quakewatch-secret
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"

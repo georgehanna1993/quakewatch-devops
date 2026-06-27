@@ -1,77 +1,182 @@
-![Screenshot of QuakeWatch](static/experts-logo.svg)
-
 # QuakeWatch
 
-**QuakeWatch** is a Flask-based web application designed to display real-time and historical earthquake data. It visualizes earthquake statistics with interactive graphs and provides detailed information sourced from the USGS Earthquake API. Built using an object‑oriented design and modular structure, QuakeWatch separates templates, utility functions, and route definitions, making it both scalable and maintainable. The application is also containerized with Docker for easy deployment.
+## Project Overview
 
-## Features
+QuakeWatch is a Python Flask web application that displays earthquake information through a simple dashboard.
 
-- **Real-Time & Historical Data:** Fetches earthquake data from the USGS API.
-- **Interactive Graphs:** Displays earthquake counts over various time periods (e.g., last 30 days, 5-year view) using Matplotlib.
-- **Top Earthquake Events:** Shows the top 5 worldwide earthquakes (last 30 days) by magnitude.
-- **Recent Earthquake Details:** Highlights the most recent earthquake event.
-- **RESTful Endpoints:** Provides endpoints for health checks, status, connectivity tests, and raw data.
-- **Clean UI:** Built with Bootstrap 5, featuring a professional navigation bar with a logo.
-- **Dockerized:** Easily containerized for streamlined deployment.
+This project demonstrates how to containerize a Flask application with Docker and deploy it to Kubernetes using production-style Kubernetes resources.
 
-## Project Structure
+---
 
-```
+# Technologies Used
+
+- Python 3.11
+- Flask
+- Docker
+- Docker Compose
+- Kubernetes
+- Docker Desktop
+- Matplotlib
+
+---
+
+# Project Structure
+
+```text
 QuakeWatch/
-├── app.py                  # Application factory and entry point
-├── dashboard.py            # Blueprint & route definitions using OOP style
-├── utils.py                # Helper functions and custom Jinja2 filters
-├── requirements.txt        # Python dependencies
-├── static/
-│   └── experts-logo.svg    # Logo file used in the UI
-└── templates/              # Jinja2 HTML templates
-    ├── base.html           # Base template with common layout and navigation
-    ├── main_page.html      # Home page content
-    └── graph_dashboard.html# Dashboard view with graphs and earthquake details
+│
+├── app.py
+├── dashboard.py
+├── utils.py
+├── requirements.txt
+├── Dockerfile
+├── docker-compose.yml
+├── README.md
+│
+├── k8s/
+│   ├── namespace.yaml
+│   ├── configmap.yaml
+│   ├── secret.yaml
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   ├── hpa.yaml
+│   └── cronjob.yaml
+│
+├── templates/
+└── static/
 ```
 
-## Installation
+---
 
-### Locally
+# Docker
 
-1. **Clone the Repository:**
+## Build the Docker Image
 
-   ```bash
-   git clone https://github.com/yourusername/QuakeWatch.git
-   cd QuakeWatch
-   ```
+```bash
+docker build -t quakewatch .
+```
 
-2. **Set Up a Virtual Environment (optional but recommended):**
+## Run with Docker Compose
 
-   ```bash
-   python -m venv venv
-   source venv/bin/activate   # On Windows: venv\Scripts\activate
-   ```
+```bash
+docker compose up --build
+```
 
-3. **Install Dependencies:**
+The application will be available at:
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+```text
+http://localhost:5050
+```
 
-## Running the Application Locally
+## Run the Docker Image
 
-1. **Start the Flask Application:**
+```bash
+docker run -p 5050:5000 quakewatch
+```
 
-   ```bash
-   python app.py
-   ```
+## Stop the Application
 
-2. **Access the Application:**
+```bash
+docker compose down
+```
 
-   Open your browser and visit [http://127.0.0.1:5000](http://127.0.0.1:5000) to view the dashboard.
+---
 
+# Docker Hub
 
-## Custom Jinja2 Filter
+Docker Image:
 
-The project includes a custom filter `timestamp_to_str` that converts epoch timestamps to human-readable strings. This filter is registered during application initialization and is used in the templates to format earthquake event times.
+```text
+gh93/quakewatch:v1
+```
 
-## Known Issues
+Pull the image:
 
-- **SSL Warning:** You might see a warning regarding LibreSSL when using urllib3. This is informational and does not affect the functionality of the application.
-- **Matplotlib Backend:** The application forces Matplotlib to use the `Agg` backend for headless rendering. Ensure this setting is applied before any Matplotlib imports to avoid GUI-related errors.
+```bash
+docker pull gh93/quakewatch:v1
+```
+
+---
+
+# Kubernetes Deployment
+
+Enable Kubernetes in Docker Desktop before deploying.
+
+Deploy all Kubernetes resources:
+
+```bash
+kubectl apply -f k8s/
+```
+
+(Optional) Set the default namespace:
+
+```bash
+kubectl config set-context --current --namespace=quakewatch
+```
+
+Verify the deployment:
+
+```bash
+kubectl get pods
+kubectl get svc
+kubectl get deployment
+```
+
+---
+
+# Access the Application
+
+Expose the application locally:
+
+```bash
+kubectl port-forward svc/quakewatch-service 5000:80
+```
+
+Open:
+
+```text
+http://localhost:5000
+```
+
+---
+
+# Kubernetes Resources
+
+The project includes the following Kubernetes resources:
+
+- Namespace
+- ConfigMap
+- Secret
+- Deployment
+- ReplicaSet (created automatically by the Deployment)
+- Service (NodePort)
+- Horizontal Pod Autoscaler (HPA)
+- CronJob
+
+---
+
+# Monitoring
+
+```bash
+kubectl get pods
+kubectl get svc
+kubectl get hpa
+kubectl top nodes
+kubectl top pods
+```
+
+---
+
+# CronJob
+
+```bash
+kubectl get cronjob
+kubectl get jobs
+kubectl logs job/<job-name>
+```
+
+---
+
+# Author
+
+George Hanna
