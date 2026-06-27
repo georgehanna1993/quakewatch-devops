@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: quakewatch
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/georgehanna1993/quakewatch-devops.git
+    targetRevision: main
+    path: charts/quakewatch
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: quakewatch
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
